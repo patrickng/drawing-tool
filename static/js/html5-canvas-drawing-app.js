@@ -39,8 +39,7 @@ var drawingApp = (function () {
         crayonTextureBlue = new Image(),
         crayonTextureRed = new Image(),
         crayonTextureBlack = new Image(),
-        clickX = [],
-        clickY = [],
+        points = [],
         clickColor = [],
         clickTool = [],
         clickSize = [],
@@ -76,8 +75,13 @@ var drawingApp = (function () {
                 return;
             }
 
+            // Set the drawing path
+            context.beginPath();
+            context.lineCap = "round";
+            context.lineJoin = "round";
+
             // For each point drawn
-            for (i = 0; i < clickX.length; i++) {
+            for (i = 0; i < points.length - 1; i++) {
                 // Set the drawing radius
                 switch (clickSize[i]) {
                 case "small":
@@ -96,27 +100,26 @@ var drawingApp = (function () {
                     break;
                 }
 
-                // Set the drawing path
-                context.beginPath();
-                context.lineCap = "round";
-                context.lineJoin = "round";
                 context.lineWidth = radius;
 
                 // If dragging then draw a line between the two points
                 if (clickDrag[i] && i) {
-                    context.moveTo(clickX[i - 1], clickY[i - 1]);
-                    var xc = (clickX[i - 1] + clickX[i]) / 2;
-                    var yc = (clickY[i - 1] + clickY[i]) / 2;
-                    context.quadraticCurveTo(clickX[i - 1], clickY[i - 1], xc, yc);
+                    context.moveTo(points[i - 1].x, points[i - 1].y);
+                    var xc = (points[i - 1].x + points[i].x) / 2;
+                    var yc = (points[i - 1].y + points[i].y) / 2;
+                    context.quadraticCurveTo(points[i - 1].x, points[i - 1].y, xc, yc);
                 } else {
-                    context.moveTo(clickX[i], clickY[i]);
-                    var xc = (clickX[i] + clickX[i + 1]) / 2;
-                    var yc = (clickY[i] + clickY[i + 1]) / 2;
-                    context.quadraticCurveTo(clickX[i], clickY[i], xc, yc);
+                    context.moveTo(points[i].x, points[i].y);
+                    var xc = (points[i].x + points[i + 1].x) / 2;
+                    var yc = (points[i].y + points[i + 1].y) / 2;
+                    context.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
                 }
-                context.lineTo(clickX[i], clickY[i]);
+                context.lineTo(points[i].x, points[i].y);
+
                 // Set the drawing color
                 if (curTool === "eraser") {
+                    //context.globalCompositeOperation = "source-over";// To erase instead of draw over with white
+                    context.restore();
                     //context.globalCompositeOperation = "destination-out"; // To erase instead of draw over with white
                     context.strokeStyle = 'white';
                 } else if (curTool === "crayon") {
@@ -145,14 +148,13 @@ var drawingApp = (function () {
                     //context.globalCompositeOperation = "source-over";    // To erase instead of draw over with white
                     context.strokeStyle = clickColor[i];
                 }
-                context.stroke();
             }
-            context.quadraticCurveTo(clickX[i - 1], clickY[i - 1], clickX[i], clickY[i]);
             context.stroke();
             context.closePath();
-            //context.globalCompositeOperation = "source-over";// To erase instead of draw over with white
-            context.restore();
 
+            // Draw the outline images
+            context.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
+            contexto.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
         },
 
         // Adds a point to the drawing array.
@@ -160,8 +162,10 @@ var drawingApp = (function () {
         // @param y
         // @param dragging
         addClick = function (x, y, dragging) {
-            clickX.push(x);
-            clickY.push(y);
+            points.push({
+                x: x,
+                y: y
+            });
             clickTool.push(curTool);
             clickColor.push(curColor);
             clickSize.push(curSize);
@@ -169,8 +173,7 @@ var drawingApp = (function () {
         },
 
         clearClick = function() {
-            clickX.length = 0;
-            clickY.length = 0;
+            points.length = 0;
             clickDrag.length = 0;
             clickColor.length = 0;
             clickSize.length = 0;
@@ -198,9 +201,7 @@ var drawingApp = (function () {
 
                 release = function () {
                     paint = false;
-                    redraw();
                     update();
-                    clearClick();
                 };
 
             // Add mouse event listeners to canvas element
@@ -219,8 +220,6 @@ var drawingApp = (function () {
         resourceLoaded = function () {
             curLoadResNum += 1;
             if (curLoadResNum === totalLoadResources) {
-                // Draw the outline image
-                contexto.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
                 redraw();
                 createUserEvents();
             }
@@ -251,6 +250,8 @@ var drawingApp = (function () {
         update = function() {
             contexto.drawImage(canvas, 0, 0);
             context.clearRect(0, 0, canvasWidth, canvasHeight);
+            clearClick();
+            contexto.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
         },
 
         // Creates a canvas element, loads images, adds events, and draws the canvas for the first time.
@@ -268,6 +269,7 @@ var drawingApp = (function () {
             canvaso.setAttribute('height', canvasHeight);
             canvaso.setAttribute('id', 'canvas-view');
             canvaso.style.border=('1px solid #333');
+
             document.getElementById('canvasDiv').appendChild(canvas);
             document.getElementById('canvasDiv').appendChild(canvaso);
             if (typeof G_vmlCanvasManager !== "undefined") {
