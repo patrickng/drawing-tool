@@ -101,21 +101,18 @@ var drawingApp = (function () {
                 context.lineCap = "round";
                 context.lineJoin = "round";
                 context.lineWidth = radius;
+
                 // If dragging then draw a line between the two points
                 if (clickDrag[i] && i) {
                     context.moveTo(clickX[i - 1], clickY[i - 1]);
-                    for (var j = 0; j < i; j++) {
-                        var xc = (clickX[i - 1] + clickX[i]) / 2;
-                        var yc = (clickY[i - 1] + clickY[i]) / 2;
-                        context.quadraticCurveTo(clickX[i - 1], clickY[i - 1], xc, yc);
-                    }
+                    var xc = (clickX[i - 1] + clickX[i]) / 2;
+                    var yc = (clickY[i - 1] + clickY[i]) / 2;
+                    context.quadraticCurveTo(clickX[i - 1], clickY[i - 1], xc, yc);
                 } else {
                     context.moveTo(clickX[i], clickY[i]);
-                    for (var j = 0; j < i; j++) {
-                        var xc = (clickX[i] + clickX[i]) / 2;
-                        var yc = (clickY[i] + clickY[i]) / 2;
-                        context.quadraticCurveTo(clickX[i], clickY[i], xc, yc);
-                    }
+                    var xc = (clickX[i] + clickX[i + 1]) / 2;
+                    var yc = (clickY[i] + clickY[i + 1]) / 2;
+                    context.quadraticCurveTo(clickX[i], clickY[i], xc, yc);
                 }
                 context.lineTo(clickX[i], clickY[i]);
                 // Set the drawing color
@@ -150,20 +147,12 @@ var drawingApp = (function () {
                 }
                 context.stroke();
             }
+            context.quadraticCurveTo(clickX[i - 1], clickY[i - 1], clickX[i], clickY[i]);
+            context.stroke();
             context.closePath();
             //context.globalCompositeOperation = "source-over";// To erase instead of draw over with white
             context.restore();
 
-            // // Overlay a crayon texture (if the current tool is crayon)
-            // if (curTool === "crayon") {
-            //     context.globalAlpha = 0.4; // No IE support
-            //     context.drawImage(crayonTextureImage, 0, 0, canvasWidth, canvasHeight);
-            // }
-            // context.globalAlpha = 1; // No IE support
-
-            // Draw the outline image
-            context.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
-            contexto.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
         },
 
         // Adds a point to the drawing array.
@@ -212,7 +201,6 @@ var drawingApp = (function () {
                     redraw();
                     update();
                     clearClick();
-                    context.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
                 };
 
             // Add mouse event listeners to canvas element
@@ -229,9 +217,10 @@ var drawingApp = (function () {
 
         // Calls the redraw function after all neccessary resources are loaded.
         resourceLoaded = function () {
-
             curLoadResNum += 1;
             if (curLoadResNum === totalLoadResources) {
+                // Draw the outline image
+                contexto.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
                 redraw();
                 createUserEvents();
             }
@@ -375,7 +364,6 @@ var drawingApp = (function () {
             $('#clear').mousedown(function(e){
                 clearClick();
                 clearCanvas();
-                context.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
                 contexto.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
             });           
         };
