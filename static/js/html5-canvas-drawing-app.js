@@ -32,7 +32,6 @@ var drawingApp = (function () {
         colorBlue = "#00B5EF",
         colorRed = "#ED1848",
         colorBlack = "#000000",
-        outlineImage = new Image(),
         crayonTexturePink = new Image(),
         crayonTextureGreen = new Image(),
         crayonTextureYellow = new Image(),
@@ -56,7 +55,7 @@ var drawingApp = (function () {
         drawingAreaY = 72,
         drawingAreaWidth = 266,
         drawingAreaHeight = 266,
-        totalLoadResources = 7,
+        totalLoadResources = 6,
         curLoadResNum = 0,
 
         // Clears the canvas.
@@ -151,10 +150,6 @@ var drawingApp = (function () {
             }
             context.stroke();
             context.closePath();
-
-            // Draw the outline images
-            context.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
-            contexto.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
         },
 
         // Adds a point to the drawing array.
@@ -251,7 +246,6 @@ var drawingApp = (function () {
             contexto.drawImage(canvas, 0, 0);
             context.clearRect(0, 0, canvasWidth, canvasHeight);
             clearClick();
-            contexto.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
         },
 
         // Creates a canvas element, loads images, adds events, and draws the canvas for the first time.
@@ -299,9 +293,6 @@ var drawingApp = (function () {
             
             crayonTextureBlack.onload = resourceLoaded;
             crayonTextureBlack.src = "static/images/crayon-texture-black.png";
-
-            outlineImage.onload = resourceLoaded;
-            outlineImage.src = "static/images/plus.png";
 
             // Mouse Events for toolbox
             
@@ -366,7 +357,6 @@ var drawingApp = (function () {
             $('#clear').mousedown(function(e){
                 clearClick();
                 clearCanvas();
-                contexto.drawImage(outlineImage, drawingAreaX, drawingAreaY, drawingAreaWidth, drawingAreaHeight);
             });           
         };
 
