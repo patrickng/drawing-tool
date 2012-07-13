@@ -1,4 +1,4 @@
-drawing-tool
+HTML5 Canvas Drawing Tool
 ============
 
-A customized version of William Malone's Drawing tool optimized for iPad
+A customized version of William Malone's drawing tool optimized for iPad
