@@ -204,10 +204,19 @@ var drawingApp = (function () {
             canvas.addEventListener("mousemove", drag, false);
             canvas.addEventListener("mouseup", release);
 
-            // Add touch event listeners to canvas element
-            canvas.addEventListener("touchstart", press, false);
-            canvas.addEventListener("touchmove", drag, false);
-            canvas.addEventListener("touchend", release, false);
+            if (Modernizr.touch) {
+                // Add touch event listeners to canvas element
+                canvas.addEventListener("touchstart", press, false);
+                canvas.addEventListener("touchmove", drag, false);
+                canvas.addEventListener("touchend", release, false);
+            }
+
+            // Add pointer events to canvas element
+            if (window.navigator.msPointerEnabled) {
+                canvas.addEventListener("MSPointerDown", press, false);
+                canvas.addEventListener("MSPointerMove", drag, false);
+                canvas.addEventListener("MSPointerUp", release, false);
+            }
 
         },
 
