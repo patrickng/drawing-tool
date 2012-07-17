@@ -196,25 +196,27 @@ var drawingApp = (function () {
 
                 release = function () {
                     paint = false;
+                    mouseDown = false;
                     update();
                 },
 
                 cancel = function () {
                     paint = false;
+                    update();
                 };
 
             if (Modernizr.touch) {
                 // Add touch event listeners to canvas element
                 canvas.addEventListener("touchstart", press, false);
                 canvas.addEventListener("touchmove", drag, false);
+                canvas.addEventListener("touchenter", drag, false);
                 canvas.addEventListener("touchend", release, false);
-                canvas.addEventListener("touchcancel", cancel, false);
             } else if (window.navigator.msPointerEnabled) {
                 // Add pointer events to canvas element
                 canvas.addEventListener("MSPointerDown", press, false);
                 canvas.addEventListener("MSPointerMove", drag, false);
                 canvas.addEventListener("MSPointerUp", release, false);
-                canvas.addEventListener("MSPointerCancel", release, false);
+                canvas.addEventListener("MSPointerOut", cancel, false);
             } else {
                 // Add mouse event listeners to canvas element
                 canvas.addEventListener("mousedown", press, false);
