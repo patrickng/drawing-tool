@@ -197,6 +197,10 @@ var drawingApp = (function () {
                 release = function () {
                     paint = false;
                     update();
+                },
+
+                cancel = function () {
+                    paint = false;
                 };
 
             if (Modernizr.touch) {
@@ -204,16 +208,19 @@ var drawingApp = (function () {
                 canvas.addEventListener("touchstart", press, false);
                 canvas.addEventListener("touchmove", drag, false);
                 canvas.addEventListener("touchend", release, false);
+                canvas.addEventListener("touchcancel", cancel, false);
             } else if (window.navigator.msPointerEnabled) {
                 // Add pointer events to canvas element
                 canvas.addEventListener("MSPointerDown", press, false);
                 canvas.addEventListener("MSPointerMove", drag, false);
                 canvas.addEventListener("MSPointerUp", release, false);
+                canvas.addEventListener("MSPointerCancel", release, false);
             } else {
                 // Add mouse event listeners to canvas element
                 canvas.addEventListener("mousedown", press, false);
                 canvas.addEventListener("mousemove", drag, false);
                 canvas.addEventListener("mouseup", release);
+                canvas.addEventListener("mouseout", cancel, false);
             }
 
         },
